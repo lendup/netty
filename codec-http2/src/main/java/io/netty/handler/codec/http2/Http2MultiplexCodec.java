@@ -256,7 +256,7 @@ public class Http2MultiplexCodec extends Http2FrameCodec {
         // Add our upgrade handler to the channel and then register the channel.
         // The register call fires the channelActive, etc.
         ch.pipeline().addLast(upgradeStreamHandler);
-        ChannelFuture future = ctx.channel().eventLoop().register(ch);
+        ChannelFuture future = ch.register();
         if (future.isDone()) {
             registerDone(future);
         } else {
@@ -276,7 +276,7 @@ public class Http2MultiplexCodec extends Http2FrameCodec {
                     break;
                 }
                 // fall-trough
-                ChannelFuture future = ctx.channel().eventLoop().register(new DefaultHttp2StreamChannel(s, false));
+                ChannelFuture future = new DefaultHttp2StreamChannel(s, false).register();
                 if (future.isDone()) {
                     registerDone(future);
                 } else {
@@ -659,6 +659,11 @@ public class Http2MultiplexCodec extends Http2FrameCodec {
         }
 
         @Override
+        public ChannelFuture register() {
+            return register(newPromise());
+        }
+
+        @Override
         public ChannelFuture deregister() {
             return pipeline().deregister();
         }
@@ -686,6 +691,11 @@ public class Http2MultiplexCodec extends Http2FrameCodec {
         @Override
         public ChannelFuture close(ChannelPromise promise) {
             return pipeline().close(promise);
+        }
+
+        @Override
+        public ChannelFuture register(ChannelPromise promise) {
+            return pipeline().register(promise);
         }
 
         @Override
@@ -847,7 +857,7 @@ public class Http2MultiplexCodec extends Http2FrameCodec {
             }
 
             @Override
-            public void register(EventLoop eventLoop, ChannelPromise promise) {
+            public void register(ChannelPromise promise) {
                 if (!promise.setUncancellable()) {
                     return;
                 }
