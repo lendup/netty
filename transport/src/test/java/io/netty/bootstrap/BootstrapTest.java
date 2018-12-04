@@ -156,7 +156,6 @@ public class BootstrapTest {
             bootstrap.localAddress(new LocalAddress("1"));
             ChannelFuture future = bootstrap.bind();
             assertFalse(future.isDone());
-            Thread.sleep(1000);
             registerHandler.registerPromise().setSuccess();
             final BlockingQueue<Boolean> queue = new LinkedBlockingQueue<Boolean>();
             future.addListener(new ChannelFutureListener() {
