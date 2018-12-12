@@ -141,6 +141,7 @@ public final class ServerCookieDecoder extends CookieDecoder {
 
             if (rfc2965Style && (header.regionMatches(nameBegin, RFC2965_PATH, 0, RFC2965_PATH.length()) ||
                     header.regionMatches(nameBegin, RFC2965_DOMAIN, 0, RFC2965_DOMAIN.length()) ||
+                    header.regionMatches(nameBegin, RFC2965_VERSION, 0, RFC2965_VERSION.length()) ||
                     header.regionMatches(nameBegin, RFC2965_PORT, 0, RFC2965_PORT.length()))) {
 
                 // skip obsolete RFC2965 fields
