@@ -59,6 +59,20 @@ public class ServerCookieDecoderTest {
         assertEquals("myValue3", cookie.value());
     }
 
+    /*
+     * Twilio likes to begin every cookie with $Version.  This was okay in netty 3.5.11.
+     * Now, it is not okay.
+     */
+    @Test
+    public void testMalformedTwilioCookie() {
+        String source = "$Version=1; LENDUP_OSRC=DIRECT; $Path=\"/\"; $Domain=.lendup.com; "
+                + "$Version=1; LENDUP_SESSION=\"XXXSESSIONXXX\"; $Path=\"/\"; $Domain=.lendup.com; "
+                + "$Version=1; LENDUP_UTM=%7B%7D; $Path=\"/\"; $Domain=.lendup.com; "
+                +"$Version=1; lendupBuckets=%7B%7D; $Path=\"/\"; $Domain=.lendup.com";
+        Set<Cookie> cookies = ServerCookieDecoder.STRICT.decode(source);
+        assertEquals(4, cookies.size());
+    }
+
     @Test
     public void testDecodingGoogleAnalyticsCookie() {
         String source =
