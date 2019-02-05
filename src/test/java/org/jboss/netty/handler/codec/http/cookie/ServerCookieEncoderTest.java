@@ -80,4 +80,18 @@ public class ServerCookieEncoderTest {
         assertTrue(Math.abs(diff - maxAge) <= 2);
 
     }
+
+    @Test
+    public void lendupExclamationPointHack() {
+
+        String result =
+                "myCookie=my!Value";
+
+        Cookie cookie = new DefaultCookie("myCookie", "my!Value");
+
+        String encodedCookie = ServerCookieEncoder.STRICT.encode(cookie);
+
+        Matcher matcher = Pattern.compile(result).matcher(encodedCookie);
+        assertTrue(matcher.find());
+    }
 }
