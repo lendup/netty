@@ -17,12 +17,19 @@ package org.jboss.netty.handler.codec.http.cookie;
 
 import static org.jboss.netty.handler.codec.http.cookie.CookieUtil.firstInvalidCookieNameOctet;
 import static org.jboss.netty.handler.codec.http.cookie.CookieUtil.firstInvalidCookieValueOctet;
+import static org.jboss.netty.handler.codec.http.cookie.CookieUtil.firstWarnCookieValueOctet;
 import static org.jboss.netty.handler.codec.http.cookie.CookieUtil.unwrapValue;
+
+import org.jboss.netty.logging.InternalLogger;
+import org.jboss.netty.logging.InternalLoggerFactory;
 
 /**
  * Parent of Client and Server side cookie encoders
  */
 public abstract class CookieEncoder {
+
+    private static final InternalLogger logger =
+            InternalLoggerFactory.getInstance(CookieEncoder.class);
 
     private final boolean strict;
 
@@ -45,6 +52,11 @@ public abstract class CookieEncoder {
 
             if ((pos = firstInvalidCookieValueOctet(unwrappedValue)) >= 0) {
                 throw new IllegalArgumentException("Cookie value contains an invalid char: " + value.charAt(pos));
+            }
+
+            if ((pos = firstWarnCookieValueOctet(unwrappedValue)) >= 0) {
+                String warning = String.format("cookie with name '%s' has invalid characters", name);
+                logger.warn(warning);
             }
         }
     }

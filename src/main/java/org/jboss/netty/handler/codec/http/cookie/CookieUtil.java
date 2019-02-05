@@ -25,6 +25,8 @@ final class CookieUtil {
 
     private static final BitSet VALID_COOKIE_NAME_OCTETS = validCookieNameOctets(VALID_COOKIE_VALUE_OCTETS);
 
+    private static final BitSet WARN_COOKIE_OCTETS = warnCookieOctets();
+
     // US-ASCII characters excluding CTLs, whitespace, DQUOTE, comma, semicolon, and backslash
     private static BitSet validCookieValueOctets() {
         BitSet bits = new BitSet(8);
@@ -32,6 +34,7 @@ final class CookieUtil {
             // US-ASCII characters excluding CTLs (%x00-1F / %x7F)
             bits.set(i);
         }
+        bits.set('!', true); // include '!' because LDC needs it for now.
         bits.set('"', false);  // exclude DQUOTE = %x22
         bits.set(',', false);  // exclude comma = %x2C
         bits.set(';', false);  // exclude semicolon = %x3B
@@ -62,6 +65,12 @@ final class CookieUtil {
         bits.set('}', false);
         bits.set(' ', false);
         bits.set('\t', false);
+        return bits;
+    }
+
+    private static BitSet warnCookieOctets() {
+        BitSet bits = new BitSet(8);
+        bits.set('!', true);
         return bits;
     }
 
@@ -122,6 +131,10 @@ final class CookieUtil {
 
     static int firstInvalidCookieValueOctet(CharSequence cs) {
         return firstInvalidOctet(cs, VALID_COOKIE_VALUE_OCTETS);
+    }
+
+    static int firstWarnCookieValueOctet(CharSequence cs) {
+        return firstInvalidOctet(cs, WARN_COOKIE_OCTETS);
     }
 
     static int firstInvalidOctet(CharSequence cs, BitSet bits) {
