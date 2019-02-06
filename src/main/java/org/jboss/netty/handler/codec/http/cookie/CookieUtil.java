@@ -134,7 +134,21 @@ final class CookieUtil {
     }
 
     static int firstWarnCookieValueOctet(CharSequence cs) {
-        return firstInvalidOctet(cs, WARN_COOKIE_OCTETS);
+
+        // This is a list of characters that are not generally allowed in cookies per spec.
+        BitSet bits = WARN_COOKIE_OCTETS;
+
+        // If you find a character in the list...
+        for (int i = 0; i < cs.length(); i++) {
+            char c = cs.charAt(i);
+            if (bits.get(c)) {
+                // return the offset of that character
+                return i;
+            }
+        }
+
+        // Else, no warning characters were found and return -1
+        return -1;
     }
 
     static int firstInvalidOctet(CharSequence cs, BitSet bits) {
